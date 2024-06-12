@@ -1,6 +1,8 @@
 com\ccamargo\farmacia\Models\SucursalModel.class
 com\ccamargo\farmacia\jfrProductos.class
 com\ccamargo\farmacia\Models\MedicamentoModel.class
+com\ccamargo\farmacia\Controllers\PedidosController.class
+com\ccamargo\farmacia\jfrProductos$2.class
 com\ccamargo\farmacia\Models\DistribuidorModel.class
 com\ccamargo\farmacia\jfrProductos$1.class
 com\ccamargo\farmacia\Farmacia.class

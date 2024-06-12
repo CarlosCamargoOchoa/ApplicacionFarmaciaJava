@@ -23,7 +23,7 @@ public class PedidosController {
     public ArrayList<PedidoDetalleModel> pedidoDetalle;
     public ArrayList<PedidoEncabezadoModel> pedidoEncabezado;
     
-    PedidosController(){
+    public PedidosController(){
         this.tipoMedicamento = new ArrayList<>();
         this.sucursal = new ArrayList<>(); 
         this.distribuidor = new ArrayList<>();
