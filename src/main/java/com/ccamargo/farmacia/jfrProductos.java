@@ -5,6 +5,8 @@
 package com.ccamargo.farmacia;
 
 import com.ccamargo.farmacia.Controllers.PedidosController;
+import javax.swing.ButtonGroup;
+import javax.swing.JPanel;
 import javax.swing.JRadioButton;
 
 /**
@@ -12,12 +14,16 @@ import javax.swing.JRadioButton;
  * @author Carlos Camargo
  */
 public class jfrProductos extends javax.swing.JFrame {
-
+    public static PedidosController objPedido;
     /**
      * Creates new form jfrProductos
      */
     public jfrProductos() {
-        initComponents();
+        objPedido = new PedidosController();
+        //this.IniciarDistribuidores();
+        setSize(869,699);
+        initComponents();        
+        
     }
 
     /**
@@ -29,7 +35,7 @@ public class jfrProductos extends javax.swing.JFrame {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
-        btnGroup = new javax.swing.ButtonGroup();
+        btnGpDistribuidores = new javax.swing.ButtonGroup();
         pnlMedicamento = new javax.swing.JPanel();
         jComboBox1 = new javax.swing.JComboBox<>();
         jLabel1 = new javax.swing.JLabel();
@@ -38,15 +44,16 @@ public class jfrProductos extends javax.swing.JFrame {
         jLabel3 = new javax.swing.JLabel();
         jSpinner1 = new javax.swing.JSpinner();
         btnAgregarProducto = new javax.swing.JButton();
-        jPanel3 = new javax.swing.JPanel();
-        jLabel4 = new javax.swing.JLabel();
-        jLabel5 = new javax.swing.JLabel();
-        jPanel1 = new javax.swing.JPanel();
+        pnlDistribuidor = new javax.swing.JPanel();
+        pnlPrevisualizacionProducto = new javax.swing.JPanel();
         jPanel2 = new javax.swing.JPanel();
         jPanel4 = new javax.swing.JPanel();
         jScrollPane1 = new javax.swing.JScrollPane();
         jTable1 = new javax.swing.JTable();
         jLabel6 = new javax.swing.JLabel();
+        jPanel1 = new javax.swing.JPanel();
+        jLabel4 = new javax.swing.JLabel();
+        jLabel5 = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setTitle("Productos");
@@ -100,7 +107,7 @@ public class jfrProductos extends javax.swing.JFrame {
                             .addComponent(jLabel3)
                             .addComponent(jSpinner1, javax.swing.GroupLayout.PREFERRED_SIZE, 140, javax.swing.GroupLayout.PREFERRED_SIZE)))
                     .addComponent(btnAgregarProducto, javax.swing.GroupLayout.Alignment.TRAILING))
-                .addContainerGap(15, Short.MAX_VALUE))
+                .addContainerGap(19, Short.MAX_VALUE))
         );
         pnlMedicamentoLayout.setVerticalGroup(
             pnlMedicamentoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -122,44 +129,41 @@ public class jfrProductos extends javax.swing.JFrame {
                 .addGap(7, 7, 7))
         );
 
-        jPanel3.setBorder(javax.swing.BorderFactory.createEtchedBorder());
-        jPanel3.setFont(new java.awt.Font("Tahoma", 0, 12)); // NOI18N
+        pnlDistribuidor.setBorder(javax.swing.BorderFactory.createEtchedBorder());
+        pnlDistribuidor.setFont(new java.awt.Font("Tahoma", 0, 12)); // NOI18N
 
-        jLabel4.setText("Distribuidor");
+        for(int i = 0; i < objPedido.distribuidor.size(); i++ ){
+            final JRadioButton btnDistribuidor = new JRadioButton(objPedido.distribuidor.get(i).getDescription());
+            btnDistribuidor.setActionCommand(objPedido.distribuidor.get(i).getDescription());
+            btnDistribuidor.setActionCommand(objPedido.distribuidor.get(i).getDescription());
+            btnDistribuidor.setSelected(false);
+            this.pnlDistribuidor.add(btnDistribuidor);
+            this.btnGpDistribuidores.add(btnDistribuidor);
+        }
+        add(this.pnlDistribuidor);
+        pack();
 
-        jLabel5.setText("Sucursal");
-
-        javax.swing.GroupLayout jPanel3Layout = new javax.swing.GroupLayout(jPanel3);
-        jPanel3.setLayout(jPanel3Layout);
-        jPanel3Layout.setHorizontalGroup(
-            jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel3Layout.createSequentialGroup()
-                .addContainerGap()
-                .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jLabel4)
-                    .addComponent(jLabel5))
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+        javax.swing.GroupLayout pnlDistribuidorLayout = new javax.swing.GroupLayout(pnlDistribuidor);
+        pnlDistribuidor.setLayout(pnlDistribuidorLayout);
+        pnlDistribuidorLayout.setHorizontalGroup(
+            pnlDistribuidorLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 444, Short.MAX_VALUE)
         );
-        jPanel3Layout.setVerticalGroup(
-            jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel3Layout.createSequentialGroup()
-                .addContainerGap()
-                .addComponent(jLabel4)
-                .addGap(44, 44, 44)
-                .addComponent(jLabel5)
-                .addContainerGap(47, Short.MAX_VALUE))
+        pnlDistribuidorLayout.setVerticalGroup(
+            pnlDistribuidorLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 58, Short.MAX_VALUE)
         );
 
-        jPanel1.setBorder(javax.swing.BorderFactory.createEtchedBorder());
+        pnlPrevisualizacionProducto.setBorder(javax.swing.BorderFactory.createEtchedBorder());
 
-        javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
-        jPanel1.setLayout(jPanel1Layout);
-        jPanel1Layout.setHorizontalGroup(
-            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+        javax.swing.GroupLayout pnlPrevisualizacionProductoLayout = new javax.swing.GroupLayout(pnlPrevisualizacionProducto);
+        pnlPrevisualizacionProducto.setLayout(pnlPrevisualizacionProductoLayout);
+        pnlPrevisualizacionProductoLayout.setHorizontalGroup(
+            pnlPrevisualizacionProductoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGap(0, 0, Short.MAX_VALUE)
         );
-        jPanel1Layout.setVerticalGroup(
-            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+        pnlPrevisualizacionProductoLayout.setVerticalGroup(
+            pnlPrevisualizacionProductoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGap(0, 0, Short.MAX_VALUE)
         );
 
@@ -171,7 +175,7 @@ public class jfrProductos extends javax.swing.JFrame {
         );
         jPanel2Layout.setVerticalGroup(
             jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 100, Short.MAX_VALUE)
+            .addGap(0, 94, Short.MAX_VALUE)
         );
 
         jPanel4.setBorder(javax.swing.BorderFactory.createEtchedBorder());
@@ -214,6 +218,23 @@ public class jfrProductos extends javax.swing.JFrame {
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
+        jPanel1.setBorder(javax.swing.BorderFactory.createEtchedBorder());
+
+        javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
+        jPanel1.setLayout(jPanel1Layout);
+        jPanel1Layout.setHorizontalGroup(
+            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 444, Short.MAX_VALUE)
+        );
+        jPanel1Layout.setVerticalGroup(
+            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 56, Short.MAX_VALUE)
+        );
+
+        jLabel4.setText("Distribuidor");
+
+        jLabel5.setText("Sucursal");
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
@@ -221,14 +242,20 @@ public class jfrProductos extends javax.swing.JFrame {
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jPanel2, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addComponent(jPanel4, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(jPanel2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addGroup(layout.createSequentialGroup()
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                            .addComponent(pnlMedicamento, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                            .addComponent(jPanel3, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                                .addComponent(pnlMedicamento, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                .addComponent(pnlDistribuidor, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                            .addComponent(jLabel5))
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
+                        .addComponent(pnlPrevisualizacionProducto, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                    .addGroup(layout.createSequentialGroup()
+                        .addComponent(jLabel4)
+                        .addGap(0, 0, Short.MAX_VALUE)))
                 .addContainerGap())
         );
         layout.setVerticalGroup(
@@ -236,11 +263,17 @@ public class jfrProductos extends javax.swing.JFrame {
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
                 .addComponent(jPanel2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGap(1, 1, 1)
+                .addComponent(jLabel4)
+                .addGap(1, 1, 1)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                    .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(pnlPrevisualizacionProducto, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addGroup(layout.createSequentialGroup()
-                        .addComponent(jPanel3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(pnlDistribuidor, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(jLabel5)
+                        .addGap(1, 1, 1)
+                        .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(pnlMedicamento, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
@@ -252,13 +285,28 @@ public class jfrProductos extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void formComponentShown(java.awt.event.ComponentEvent evt) {//GEN-FIRST:event_formComponentShown
-//        PedidosController objPedido = new PedidosController();
-//        for(int i = 0; i < objPedido.distribuidor.size(); i++ ){
-//        JRadioButton btnDistribuidor = new JRadioButton(objPedido.distribuidor.get(i).getDescription());
-//        
-//        }
+        
+        
+
     }//GEN-LAST:event_formComponentShown
 
+    private void IniciarDistribuidores(){
+                
+        this.pnlDistribuidor = new JPanel();
+        this.btnGpDistribuidores = new ButtonGroup();
+        
+        //ButtonGroup group = new ButtonGroup();
+        for(int i = 0; i < objPedido.distribuidor.size(); i++ ){
+            final JRadioButton btnDistribuidor = new JRadioButton(objPedido.distribuidor.get(i).getDescription());
+            btnDistribuidor.setActionCommand(objPedido.distribuidor.get(i).getDescription());
+            btnDistribuidor.setActionCommand(objPedido.distribuidor.get(i).getDescription());
+            btnDistribuidor.setSelected(false);
+            this.pnlDistribuidor.add(btnDistribuidor);
+            this.btnGpDistribuidores.add(btnDistribuidor);
+        }
+        add(pnlDistribuidor);
+        pack();
+    }
     /**
      * @param args the command line arguments
      */
@@ -296,7 +344,7 @@ public class jfrProductos extends javax.swing.JFrame {
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnAgregarProducto;
-    public javax.swing.ButtonGroup btnGroup;
+    public javax.swing.ButtonGroup btnGpDistribuidores;
     private javax.swing.JComboBox<String> jComboBox1;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
@@ -306,12 +354,13 @@ public class jfrProductos extends javax.swing.JFrame {
     private javax.swing.JLabel jLabel6;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel2;
-    private javax.swing.JPanel jPanel3;
     private javax.swing.JPanel jPanel4;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JSpinner jSpinner1;
     private javax.swing.JTable jTable1;
     private javax.swing.JTextField jTextField1;
+    private javax.swing.JPanel pnlDistribuidor;
     private javax.swing.JPanel pnlMedicamento;
+    private javax.swing.JPanel pnlPrevisualizacionProducto;
     // End of variables declaration//GEN-END:variables
 }
