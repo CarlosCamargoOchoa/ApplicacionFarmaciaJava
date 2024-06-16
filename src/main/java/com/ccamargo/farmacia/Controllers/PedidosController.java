@@ -101,4 +101,24 @@ public class PedidosController {
         return obj.getId();
     }
     
+    public SucursalModel ObtenerSucursalPorId(int sucursalId){
+        for(var s :this.sucursal)
+        {
+            if(s.getId() == sucursalId){
+                return s;
+            }
+        }
+        return this.sucursal.getFirst();
+    }
+    
+    public TipoMedicamentoModel ObtenerTipoMedicamentoDesc(String tipoMedicamentoDesc){
+        for(var s :this.tipoMedicamento)
+        {
+            if(s.getDescription().equals(tipoMedicamentoDesc)){
+                return s;
+            }
+        }
+        return this.tipoMedicamento.getFirst();
+    }
+    
 }

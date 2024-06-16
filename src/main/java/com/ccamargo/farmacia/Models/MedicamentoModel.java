@@ -13,18 +13,22 @@ public class MedicamentoModel {
     private int id;
     private String descripcion;
     private TipoMedicamentoModel tipoMedicamento;
+    private int cantidad;
     
-    MedicamentoModel(int _id, String _descripcion, TipoMedicamentoModel _tipoMedicamento){
+    public MedicamentoModel(int _id, String _descripcion, TipoMedicamentoModel _tipoMedicamento, int _cantidad){
         this.setId(_id);
         this.setDescripcion(_descripcion);
         this.setTipoMedicamento(_tipoMedicamento);
+        this.setCantidad(_cantidad);
     }
     
     public void setId(int _id){id = _id;}
     public void setDescripcion(String _descripcion){descripcion = _descripcion;}
     public void setTipoMedicamento(TipoMedicamentoModel _tipoMedicamento){tipoMedicamento = _tipoMedicamento;}
+    public void setCantidad(int _cantidad){cantidad = _cantidad;}
     
     public int getId(){return id;}
     public String getDescription(){return descripcion;};
     public TipoMedicamentoModel getTipoMedicamento(){return tipoMedicamento;};
+    public int getCantidad(){return cantidad;}
 }
