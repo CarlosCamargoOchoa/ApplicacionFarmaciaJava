@@ -32,6 +32,18 @@ public class PedidosController {
         this.CrearDatos();
     }
     
+    public ArrayList<SucursalModel> SucursalesPorDistribuidor(DistribuidorModel _distribuidor)
+    {
+        ArrayList<SucursalModel> _sucursalesFiltradas = new ArrayList<SucursalModel>();
+        for(SucursalModel _obj : this.sucursal){
+            if(_distribuidor.getId() == _obj.getDistribuidor().getId() ) {
+                _sucursalesFiltradas.add(_obj);
+            } 
+        }
+        return _sucursalesFiltradas;
+    
+    }
+    
     private void CrearDatos() {
         TipoMedicamentoModel analgesico = new TipoMedicamentoModel(1,"Analgésico");
         TipoMedicamentoModel analeptico = new TipoMedicamentoModel(2,"Analéptico");

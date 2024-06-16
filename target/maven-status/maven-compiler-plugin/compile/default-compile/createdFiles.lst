@@ -7,5 +7,6 @@ com\ccamargo\farmacia\Models\DistribuidorModel.class
 com\ccamargo\farmacia\jfrProductos$1.class
 com\ccamargo\farmacia\Farmacia.class
 com\ccamargo\farmacia\Models\PedidoEncabezadoModel.class
+com\ccamargo\farmacia\jfrProductos$3.class
 com\ccamargo\farmacia\Models\PedidoDetalleModel.class
 com\ccamargo\farmacia\Models\TipoMedicamentoModel.class
