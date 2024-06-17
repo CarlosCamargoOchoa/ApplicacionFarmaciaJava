@@ -101,6 +101,18 @@ public class PedidosController {
         return obj.getId();
     }
     
+    public PedidoDetalleModel ConsultarDetallePorEncabezado(PedidoEncabezadoModel _encabezado)
+    {
+        for(var obj : this.pedidoDetalle)
+        {
+            if(obj.getEncabezado().getId() == _encabezado.getId())
+            {
+                return obj;
+            }
+        }
+        return new PedidoDetalleModel(-1);
+    }
+    
     public SucursalModel ObtenerSucursalPorId(int sucursalId){
         for(var s :this.sucursal)
         {

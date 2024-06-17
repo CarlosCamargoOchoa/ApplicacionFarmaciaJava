@@ -16,17 +16,30 @@ import java.awt.Dimension;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.Enumeration;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.AbstractButton;
 import javax.swing.BorderFactory;
 import javax.swing.ButtonGroup;
 import javax.swing.JCheckBox;
+import javax.swing.JFormattedTextField;
 import javax.swing.JPanel;
 import javax.swing.JRadioButton;
 import javax.swing.JSpinner;
 import javax.swing.SpinnerNumberModel;
+import javax.swing.Timer;
 import javax.swing.table.DefaultTableModel;
+import javax.swing.text.AbstractDocument;
+import javax.swing.text.AttributeSet;
+import javax.swing.text.BadLocationException;
+import javax.swing.text.DocumentFilter;
+import javax.swing.text.DocumentFilter.FilterBypass;
+import javax.swing.text.MaskFormatter;
 
 /**
  *
@@ -45,18 +58,42 @@ public class jfrProductos extends javax.swing.JFrame {
     /**
      * Creates new form jfrProductos
      */
-    public jfrProductos() {
+    public jfrProductos() throws ParseException {
+        SimpleDateFormat formato = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
+        Timer timer = new Timer(1000, e -> lblHoraFecha.setText(formato.format(new Date())));
+        timer.start();
         this.CrearEncabezado = true;
         this.objPedido = new PedidosController();
         this.objSucursal = new ArrayList<Integer>(); 
         setSize(new java.awt.Dimension(1162, 710));
         setResizable(false);
-        //setLocationRelativeTo(null);
         setDefaultCloseOperation(EXIT_ON_CLOSE);  
         initComponents();        
         this.pnlSucursal.setPreferredSize(new Dimension(435, 68));
         ((SpinnerNumberModel) this.jsCantidadProducto.getModel()).setMinimum(0);
         this.IniciarTiposMedicamentos();
+        this.EnmascararCampoNombreMedicamento();
+
+        
+    }
+    
+    public void EnmascararCampoNombreMedicamento(){
+        ((AbstractDocument) this.txtNombreProducto.getDocument()).setDocumentFilter(new DocumentFilter() {
+        @Override
+        public void insertString(FilterBypass fb, int offset, String string, AttributeSet attr) throws BadLocationException {
+            if (string.matches("[a-zA-Z0-9 ñÑ]*")) {
+                super.insertString(fb, offset, string, attr);
+            }
+        }
+
+        @Override
+        public void replace(FilterBypass fb, int offset, int length, String text, AttributeSet attrs) throws BadLocationException {
+            if (text.matches("[a-zA-Z0-9 ñÑ]*")) {
+                super.replace(fb, offset, length, text, attrs);
+            }
+        }
+        });
+    
     }
 
     /**
@@ -77,6 +114,9 @@ public class jfrProductos extends javax.swing.JFrame {
         jLabel3 = new javax.swing.JLabel();
         jsCantidadProducto = new javax.swing.JSpinner();
         btnAgregarProducto = new javax.swing.JButton();
+        lblValidacionNombreMedicamento = new javax.swing.JLabel();
+        lblValidacionTipoMedicamento = new javax.swing.JLabel();
+        lblValidacionCantidadProducto = new javax.swing.JLabel();
         pnlDistribuidor = new javax.swing.JPanel();
         pnlPrevisualizacionProducto = new javax.swing.JPanel();
         jLabel7 = new javax.swing.JLabel();
@@ -87,16 +127,20 @@ public class jfrProductos extends javax.swing.JFrame {
         jScrollPane2 = new javax.swing.JScrollPane();
         tblProductos = new javax.swing.JTable();
         btnTerminarPedido = new javax.swing.JButton();
+        jLabel13 = new javax.swing.JLabel();
+        lblHoraFecha = new javax.swing.JLabel();
         pnlTitulo = new javax.swing.JPanel();
         jPanel4 = new javax.swing.JPanel();
         jScrollPane1 = new javax.swing.JScrollPane();
-        jTable1 = new javax.swing.JTable();
+        tblHistoricoProductos = new javax.swing.JTable();
         jLabel6 = new javax.swing.JLabel();
         pnlSucursal = new javax.swing.JPanel();
         chkDireccion1 = new javax.swing.JCheckBox();
         chkDireccion2 = new javax.swing.JCheckBox();
         jLabel4 = new javax.swing.JLabel();
         jLabel5 = new javax.swing.JLabel();
+        lblValidacionSucursal = new javax.swing.JLabel();
+        lblValidacionDistribuidor = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setTitle("Productos");
@@ -117,13 +161,30 @@ public class jfrProductos extends javax.swing.JFrame {
         pnlMedicamento.setOpaque(false);
 
         jcbTiposMedicamentos.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Seleccionar..." }));
+        jcbTiposMedicamentos.addItemListener(new java.awt.event.ItemListener() {
+            public void itemStateChanged(java.awt.event.ItemEvent evt) {
+                jcbTiposMedicamentosItemStateChanged(evt);
+            }
+        });
 
         jLabel1.setText("Tipo de medicamento");
         jLabel1.setToolTipText("");
 
+        txtNombreProducto.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyTyped(java.awt.event.KeyEvent evt) {
+                txtNombreProductoKeyTyped(evt);
+            }
+        });
+
         jLabel2.setText("Nombre del medicamento");
 
         jLabel3.setText("Cantidad de unidades");
+
+        jsCantidadProducto.addChangeListener(new javax.swing.event.ChangeListener() {
+            public void stateChanged(javax.swing.event.ChangeEvent evt) {
+                jsCantidadProductoStateChanged(evt);
+            }
+        });
 
         btnAgregarProducto.setText("Agregar");
         btnAgregarProducto.setToolTipText("");
@@ -134,6 +195,8 @@ public class jfrProductos extends javax.swing.JFrame {
             }
         });
 
+        lblValidacionNombreMedicamento.setToolTipText("");
+
         javax.swing.GroupLayout pnlMedicamentoLayout = new javax.swing.GroupLayout(pnlMedicamento);
         pnlMedicamento.setLayout(pnlMedicamentoLayout);
         pnlMedicamentoLayout.setHorizontalGroup(
@@ -141,40 +204,55 @@ public class jfrProductos extends javax.swing.JFrame {
             .addGroup(pnlMedicamentoLayout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(pnlMedicamentoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(txtNombreProducto, javax.swing.GroupLayout.PREFERRED_SIZE, 419, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jLabel2)
+                    .addComponent(jcbTiposMedicamentos, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(txtNombreProducto)
                     .addGroup(pnlMedicamentoLayout.createSequentialGroup()
                         .addGroup(pnlMedicamentoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, pnlMedicamentoLayout.createSequentialGroup()
-                                .addComponent(jcbTiposMedicamentos, javax.swing.GroupLayout.PREFERRED_SIZE, 273, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED))
+                            .addGroup(pnlMedicamentoLayout.createSequentialGroup()
+                                .addComponent(jLabel2)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(lblValidacionNombreMedicamento))
+                            .addGroup(pnlMedicamentoLayout.createSequentialGroup()
+                                .addComponent(jLabel3)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(lblValidacionCantidadProducto, javax.swing.GroupLayout.PREFERRED_SIZE, 236, javax.swing.GroupLayout.PREFERRED_SIZE))
                             .addGroup(pnlMedicamentoLayout.createSequentialGroup()
                                 .addComponent(jLabel1)
-                                .addGap(163, 163, 163)))
-                        .addGroup(pnlMedicamentoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(jLabel3)
-                            .addComponent(jsCantidadProducto, javax.swing.GroupLayout.PREFERRED_SIZE, 140, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                    .addComponent(btnAgregarProducto, javax.swing.GroupLayout.Alignment.TRAILING))
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(lblValidacionTipoMedicamento, javax.swing.GroupLayout.PREFERRED_SIZE, 297, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                        .addGap(0, 0, Short.MAX_VALUE))
+                    .addGroup(pnlMedicamentoLayout.createSequentialGroup()
+                        .addComponent(jsCantidadProducto, javax.swing.GroupLayout.PREFERRED_SIZE, 140, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addComponent(btnAgregarProducto)))
+                .addContainerGap())
         );
         pnlMedicamentoLayout.setVerticalGroup(
             pnlMedicamentoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(pnlMedicamentoLayout.createSequentialGroup()
                 .addGap(8, 8, 8)
-                .addComponent(jLabel2)
+                .addGroup(pnlMedicamentoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jLabel2)
+                    .addComponent(lblValidacionNombreMedicamento))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(txtNombreProducto, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(pnlMedicamentoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jLabel1)
-                    .addComponent(jLabel3))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addGroup(pnlMedicamentoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jcbTiposMedicamentos, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jsCantidadProducto, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGroup(pnlMedicamentoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(pnlMedicamentoLayout.createSequentialGroup()
+                        .addGap(0, 0, Short.MAX_VALUE)
+                        .addComponent(jLabel1))
+                    .addComponent(lblValidacionTipoMedicamento, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(btnAgregarProducto, javax.swing.GroupLayout.PREFERRED_SIZE, 40, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(7, 7, 7))
+                .addComponent(jcbTiposMedicamentos, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(pnlMedicamentoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jLabel3)
+                    .addComponent(lblValidacionCantidadProducto, javax.swing.GroupLayout.PREFERRED_SIZE, 14, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(pnlMedicamentoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jsCantidadProducto, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(btnAgregarProducto, javax.swing.GroupLayout.PREFERRED_SIZE, 40, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGap(8, 8, 8))
         );
 
         pnlDistribuidor.setBorder(javax.swing.BorderFactory.createEtchedBorder());
@@ -219,6 +297,14 @@ public class jfrProductos extends javax.swing.JFrame {
         jScrollPane2.setViewportView(tblProductos);
 
         btnTerminarPedido.setText("Finalizar");
+        btnTerminarPedido.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnTerminarPedidoActionPerformed(evt);
+            }
+        });
+
+        jLabel13.setFont(new java.awt.Font("Tahoma", 0, 18)); // NOI18N
+        jLabel13.setText("Fecha y Hora:");
 
         javax.swing.GroupLayout pnlPrevisualizacionProductoLayout = new javax.swing.GroupLayout(pnlPrevisualizacionProducto);
         pnlPrevisualizacionProducto.setLayout(pnlPrevisualizacionProductoLayout);
@@ -235,13 +321,18 @@ public class jfrProductos extends javax.swing.JFrame {
                         .addGroup(pnlPrevisualizacionProductoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addComponent(lblDistribuidor, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                             .addComponent(lblSucursal, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
-                    .addGroup(pnlPrevisualizacionProductoLayout.createSequentialGroup()
-                        .addComponent(jLabel12, javax.swing.GroupLayout.PREFERRED_SIZE, 179, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(0, 0, Short.MAX_VALUE))
-                    .addComponent(jScrollPane2)
+                    .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 827, Short.MAX_VALUE)
                     .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, pnlPrevisualizacionProductoLayout.createSequentialGroup()
                         .addGap(0, 0, Short.MAX_VALUE)
-                        .addComponent(btnTerminarPedido, javax.swing.GroupLayout.PREFERRED_SIZE, 89, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                        .addComponent(btnTerminarPedido, javax.swing.GroupLayout.PREFERRED_SIZE, 89, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addGroup(pnlPrevisualizacionProductoLayout.createSequentialGroup()
+                        .addGroup(pnlPrevisualizacionProductoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(jLabel12, javax.swing.GroupLayout.PREFERRED_SIZE, 179, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addGroup(pnlPrevisualizacionProductoLayout.createSequentialGroup()
+                                .addComponent(jLabel13)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                                .addComponent(lblHoraFecha)))
+                        .addGap(0, 0, Short.MAX_VALUE)))
                 .addContainerGap())
         );
         pnlPrevisualizacionProductoLayout.setVerticalGroup(
@@ -249,7 +340,11 @@ public class jfrProductos extends javax.swing.JFrame {
             .addGroup(pnlPrevisualizacionProductoLayout.createSequentialGroup()
                 .addContainerGap()
                 .addComponent(jLabel12)
-                .addGap(36, 36, 36)
+                .addGap(14, 14, 14)
+                .addGroup(pnlPrevisualizacionProductoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jLabel13)
+                    .addComponent(lblHoraFecha))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(pnlPrevisualizacionProductoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
                     .addComponent(jLabel7)
                     .addComponent(lblDistribuidor, javax.swing.GroupLayout.PREFERRED_SIZE, 22, javax.swing.GroupLayout.PREFERRED_SIZE))
@@ -259,8 +354,8 @@ public class jfrProductos extends javax.swing.JFrame {
                     .addComponent(jLabel8, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 141, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(btnTerminarPedido, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addComponent(btnTerminarPedido, javax.swing.GroupLayout.PREFERRED_SIZE, 45, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap())
         );
 
@@ -277,7 +372,7 @@ public class jfrProductos extends javax.swing.JFrame {
 
         jPanel4.setBorder(javax.swing.BorderFactory.createEtchedBorder());
 
-        jTable1.setModel(new javax.swing.table.DefaultTableModel(
+        tblHistoricoProductos.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
                 {null, null, null, null},
                 {null, null, null, null},
@@ -288,7 +383,7 @@ public class jfrProductos extends javax.swing.JFrame {
                 "Distribuidor", "Sucursal", "Fecha", "Cantidad productos"
             }
         ));
-        jScrollPane1.setViewportView(jTable1);
+        jScrollPane1.setViewportView(tblHistoricoProductos);
 
         jLabel6.setText("Historial de pedidos");
 
@@ -312,10 +407,22 @@ public class jfrProductos extends javax.swing.JFrame {
                 .addComponent(jLabel6)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 125, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(14, Short.MAX_VALUE))
+                .addContainerGap(20, Short.MAX_VALUE))
         );
 
         pnlSucursal.setBorder(javax.swing.BorderFactory.createEtchedBorder());
+
+        chkDireccion1.addItemListener(new java.awt.event.ItemListener() {
+            public void itemStateChanged(java.awt.event.ItemEvent evt) {
+                chkDireccion1ItemStateChanged(evt);
+            }
+        });
+
+        chkDireccion2.addItemListener(new java.awt.event.ItemListener() {
+            public void itemStateChanged(java.awt.event.ItemEvent evt) {
+                chkDireccion2ItemStateChanged(evt);
+            }
+        });
 
         javax.swing.GroupLayout pnlSucursalLayout = new javax.swing.GroupLayout(pnlSucursal);
         pnlSucursal.setLayout(pnlSucursalLayout);
@@ -326,7 +433,7 @@ public class jfrProductos extends javax.swing.JFrame {
                 .addGroup(pnlSucursalLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(chkDireccion2, javax.swing.GroupLayout.PREFERRED_SIZE, 132, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(chkDireccion1, javax.swing.GroupLayout.PREFERRED_SIZE, 132, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addContainerGap(334, Short.MAX_VALUE))
         );
         pnlSucursalLayout.setVerticalGroup(
             pnlSucursalLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -349,18 +456,25 @@ public class jfrProductos extends javax.swing.JFrame {
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(pnlTitulo, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                        .addGap(0, 0, Short.MAX_VALUE)
+                        .addComponent(pnlTitulo, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                     .addComponent(jPanel4, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addGroup(layout.createSequentialGroup()
                         .addComponent(jLabel4)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(lblValidacionDistribuidor)
                         .addGap(0, 0, Short.MAX_VALUE))
                     .addGroup(layout.createSequentialGroup()
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                                .addComponent(pnlMedicamento, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                .addComponent(pnlDistribuidor, javax.swing.GroupLayout.DEFAULT_SIZE, 435, Short.MAX_VALUE)
-                                .addComponent(pnlSucursal, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                            .addComponent(jLabel5))
+                                .addComponent(pnlDistribuidor, javax.swing.GroupLayout.DEFAULT_SIZE, 476, Short.MAX_VALUE)
+                                .addComponent(pnlSucursal, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                .addComponent(pnlMedicamento, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                            .addGroup(layout.createSequentialGroup()
+                                .addComponent(jLabel5)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(lblValidacionSucursal)))
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(pnlPrevisualizacionProducto, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
                 .addContainerGap())
@@ -371,19 +485,23 @@ public class jfrProductos extends javax.swing.JFrame {
                 .addContainerGap()
                 .addComponent(pnlTitulo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(1, 1, 1)
-                .addComponent(jLabel4)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jLabel4)
+                    .addComponent(lblValidacionDistribuidor))
                 .addGap(1, 1, 1)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                     .addGroup(layout.createSequentialGroup()
                         .addComponent(pnlDistribuidor, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(jLabel5)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                            .addComponent(jLabel5)
+                            .addComponent(lblValidacionSucursal))
                         .addGap(1, 1, 1)
                         .addComponent(pnlSucursal, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(pnlMedicamento, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                     .addComponent(pnlPrevisualizacionProducto, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                .addGap(18, 18, 18)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(jPanel4, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
@@ -402,6 +520,35 @@ public class jfrProductos extends javax.swing.JFrame {
             this.AgregarMedicamento();
         }
     }//GEN-LAST:event_btnAgregarProductoActionPerformed
+
+    private void chkDireccion1ItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_chkDireccion1ItemStateChanged
+        this.lblValidacionSucursal.setText("");
+        this.pnlSucursal.setBorder(BorderFactory.createEtchedBorder());
+    }//GEN-LAST:event_chkDireccion1ItemStateChanged
+
+    private void chkDireccion2ItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_chkDireccion2ItemStateChanged
+        this.lblValidacionSucursal.setText("");
+        this.pnlSucursal.setBorder(BorderFactory.createEtchedBorder());
+    }//GEN-LAST:event_chkDireccion2ItemStateChanged
+
+    private void txtNombreProductoKeyTyped(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txtNombreProductoKeyTyped
+        this.lblValidacionNombreMedicamento.setText("");
+        this.txtNombreProducto.setBorder(BorderFactory.createEmptyBorder());
+    }//GEN-LAST:event_txtNombreProductoKeyTyped
+
+    private void jcbTiposMedicamentosItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_jcbTiposMedicamentosItemStateChanged
+        this.lblValidacionTipoMedicamento.setText("");
+        this.jcbTiposMedicamentos.setBorder(BorderFactory.createEmptyBorder());
+    }//GEN-LAST:event_jcbTiposMedicamentosItemStateChanged
+
+    private void jsCantidadProductoStateChanged(javax.swing.event.ChangeEvent evt) {//GEN-FIRST:event_jsCantidadProductoStateChanged
+        this.lblValidacionCantidadProducto.setText("");
+        this.jsCantidadProducto.setBorder(BorderFactory.createEmptyBorder());
+    }//GEN-LAST:event_jsCantidadProductoStateChanged
+
+    private void btnTerminarPedidoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnTerminarPedidoActionPerformed
+        this.ReestablecerComponentesFormulario();
+    }//GEN-LAST:event_btnTerminarPedidoActionPerformed
 
     private void AgregarMedicamento()
     {
@@ -428,11 +575,15 @@ public class jfrProductos extends javax.swing.JFrame {
         {
             medicamentoId = objPedido.pedidoDetalle.size() + 1;
         }
-        PedidoDetalleModel detallePedido = new PedidoDetalleModel(this.objPedido.pedidoDetalle.size() + 1);
-        MedicamentoModel medicamento = new MedicamentoModel(medicamentoId,nombreProducto,tipoMedicamento,cantidadProducto);
-        detallePedido.setMedicamentos(medicamento);
-        this.objPedido.pedidoDetalle.add(detallePedido);
-        this.AgregarRegistrosTablaProductos();
+        PedidoDetalleModel dt = this.objPedido.ConsultarDetallePorEncabezado(encabezadoPedido);
+        if(dt.getId() < 0){
+            dt = new PedidoDetalleModel(this.objPedido.pedidoDetalle.size() + 1);
+            dt.setEncabezado(encabezadoPedido);
+            this.objPedido.pedidoDetalle.add(dt);
+        }
+         MedicamentoModel medicamento = new MedicamentoModel(medicamentoId,nombreProducto,tipoMedicamento,cantidadProducto);
+         dt.setMedicamentos(medicamento);
+        this.AgregarRegistrosTablaProductos(dt.getEncabezado().getId());
         this.jsCantidadProducto.setValue(0);
     
     }
@@ -451,6 +602,9 @@ public class jfrProductos extends javax.swing.JFrame {
         if(idDistribuidorSeleccionado < 0)
         {
             objValidacionCompleta = false;
+            this.lblValidacionDistribuidor.setText("Distribuidor requerido.");
+            this.lblValidacionDistribuidor.setForeground(Color.RED);
+            this.pnlDistribuidor.setBorder(BorderFactory.createLineBorder(Color.RED, 2));
         }
         else
         {
@@ -459,6 +613,9 @@ public class jfrProductos extends javax.swing.JFrame {
         if(!(this.chkDireccion1.isSelected() || this.chkDireccion2.isSelected()))
         {
             objValidacionCompleta = false;
+            this.lblValidacionSucursal.setText("Sucursal requerida.");
+            this.lblValidacionSucursal.setForeground(Color.RED);
+            this.pnlSucursal.setBorder(BorderFactory.createLineBorder(Color.RED, 2));
         }
         else
         {
@@ -468,15 +625,21 @@ public class jfrProductos extends javax.swing.JFrame {
         if(txtNombreProducto.getText().equals(""))
         {
             objValidacionCompleta = false;
+            this.lblValidacionNombreMedicamento.setText("Nombre del medicamento requerido.");
+            this.lblValidacionNombreMedicamento.setForeground(Color.RED);
+            this.txtNombreProducto.setBorder(BorderFactory.createLineBorder(Color.RED, 2));
         }
         else
         {
             this.objNombreMedicamento = txtNombreProducto.getText();
         }
         String tipoProducto = (String)jcbTiposMedicamentos.getSelectedItem();
-        if(tipoProducto.equals(""))
+        if(tipoProducto.equals("Seleccionar..."))
         {
             objValidacionCompleta = false;
+            this.lblValidacionTipoMedicamento.setText("Tipo de medicamento no valido.");
+            this.lblValidacionTipoMedicamento.setForeground(Color.RED);
+            this.jcbTiposMedicamentos.setBorder(BorderFactory.createLineBorder(Color.RED, 2));
         }
         else
         {
@@ -486,6 +649,9 @@ public class jfrProductos extends javax.swing.JFrame {
         if((Integer)jsCantidadProducto.getValue() <= 0)
         {
             objValidacionCompleta = false;
+            this.lblValidacionCantidadProducto.setText("Cantidad de medicamento requerida.");
+            this.lblValidacionCantidadProducto.setForeground(Color.RED);
+            this.jsCantidadProducto.setBorder(BorderFactory.createLineBorder(Color.RED, 2));
         }
         else
         {
@@ -494,14 +660,15 @@ public class jfrProductos extends javax.swing.JFrame {
         return objValidacionCompleta;
     }
     
-    public void AgregarRegistrosTablaProductos(){
+    public void AgregarRegistrosTablaProductos(int encabezadoId){
         DefaultTableModel model = (DefaultTableModel) tblProductos.getModel();
         model.setRowCount(0);
         for(var dp :this.objPedido.pedidoDetalle){
-            for(var obj :dp.getMedicamentos()){
-                model.insertRow(0, new Object[]{obj.getTipoMedicamento().getDescription(),obj.getDescription(),obj.getCantidad()});
+            if(dp.getEncabezado().getId() == encabezadoId){
+                for(var obj :dp.getMedicamentos()){
+                    model.insertRow(0, new Object[]{obj.getTipoMedicamento().getDescription(),obj.getDescription(),obj.getCantidad()});
+                }
             }
-
         }
 
     }
@@ -565,6 +732,10 @@ public class jfrProductos extends javax.swing.JFrame {
                 
                 chkDireccion1.setVisible(true);
                 chkDireccion2.setVisible(true);
+                
+                this.lblValidacionDistribuidor.setText("");
+                this.pnlDistribuidor.setBorder(BorderFactory.createEtchedBorder());
+                
             });
             
             this.pnlDistribuidor.add(btnDistribuidor);
@@ -580,6 +751,72 @@ public class jfrProductos extends javax.swing.JFrame {
             jcbTiposMedicamentos.addItem(obj.getDescription());
         }
     }
+    
+    public void ReestablecerComponentesFormulario(){
+        this.VisualizarHistoricoPedido();
+        this.MostrarReciboCaja();
+        this.CrearEncabezado = true;
+        chkDireccion1.setVisible(false);
+        chkDireccion1.setSelected(false);
+        chkDireccion2.setVisible(false);
+        chkDireccion2.setSelected(false);
+        txtNombreProducto.setText("");
+        jcbTiposMedicamentos.setSelectedIndex(0);
+        jsCantidadProducto.setValue(0);
+        DefaultTableModel model = (DefaultTableModel) tblProductos.getModel();
+        lblDistribuidor.setText("");
+        lblSucursal.setText("");
+        model.setRowCount(0);
+    }
+    public void MostrarReciboCaja(){
+        PedidoDetalleModel objPedido = this.objPedido.pedidoDetalle.getLast();
+        var obj = new jfrReciboCaja();
+        String sucursales = "";
+        String direcciones = "";
+        for(var t : objPedido.getEncabezado().getSucursales())
+        {
+            sucursales += t.getDescription() + " - ";
+            direcciones += t.getDireccion() + " - ";
+        }
+        obj.lblDistribuidor.setText(objPedido.getEncabezado().getSucursales().getLast().getDistribuidor().getDescription());
+        obj.lblDireccion.setText(direcciones);
+        obj.lblSucursal.setText(sucursales);
+        obj.lblFechaHoraFrm.setText(this.lblHoraFecha.getText());
+        
+        DefaultTableModel model = (DefaultTableModel) obj.tblProductos.getModel();
+        model.setRowCount(0);
+        for(var dp :this.objPedido.pedidoDetalle){
+            if(dp.getEncabezado().getId() == objPedido.getEncabezado().getId()){
+                for(var ob :dp.getMedicamentos()){
+                    model.insertRow(0, new Object[]{ob.getTipoMedicamento().getDescription(),ob.getDescription(),ob.getCantidad()});
+                }
+            }
+        }
+        obj.setVisible(true);
+    
+    }
+    public void VisualizarHistoricoPedido(){
+        DefaultTableModel model = (DefaultTableModel) tblHistoricoProductos.getModel();
+        model.setRowCount(0);
+        for(var dp :this.objPedido.pedidoDetalle){
+            int totalMedicamentos = 0;
+            for(var obj :dp.getMedicamentos()){
+                totalMedicamentos += obj.getCantidad();
+            }
+            String Sucursales = "";
+            ArrayList<SucursalModel> objS = dp.getEncabezado().getSucursales();
+            for(var s : objS)
+            {
+                Sucursales += s.getDescription() + " ";
+            }
+
+            model.insertRow(0, new Object[]{dp.getEncabezado().getSucursales().getFirst().getDistribuidor().getDescription() 
+                    ,Sucursales ,this.lblHoraFecha.getText(),totalMedicamentos});
+        }
+        
+    
+    }
+
     
     /**
      * @param args the command line arguments
@@ -607,7 +844,11 @@ public class jfrProductos extends javax.swing.JFrame {
         /* Create and display the form */
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
-                new jfrProductos().setVisible(true);
+                try {
+                    new jfrProductos().setVisible(true);
+                } catch (ParseException ex) {
+                    Logger.getLogger(jfrProductos.class.getName()).log(Level.SEVERE, null, ex);
+                }
             }
         });
     }
@@ -620,6 +861,7 @@ public class jfrProductos extends javax.swing.JFrame {
     private javax.swing.JCheckBox chkDireccion2;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel12;
+    private javax.swing.JLabel jLabel13;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel4;
@@ -630,16 +872,22 @@ public class jfrProductos extends javax.swing.JFrame {
     private javax.swing.JPanel jPanel4;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JScrollPane jScrollPane2;
-    private javax.swing.JTable jTable1;
     private javax.swing.JComboBox<String> jcbTiposMedicamentos;
     private javax.swing.JSpinner jsCantidadProducto;
     private javax.swing.JLabel lblDistribuidor;
+    private javax.swing.JLabel lblHoraFecha;
     private javax.swing.JLabel lblSucursal;
+    private javax.swing.JLabel lblValidacionCantidadProducto;
+    private javax.swing.JLabel lblValidacionDistribuidor;
+    private javax.swing.JLabel lblValidacionNombreMedicamento;
+    private javax.swing.JLabel lblValidacionSucursal;
+    private javax.swing.JLabel lblValidacionTipoMedicamento;
     private javax.swing.JPanel pnlDistribuidor;
     private javax.swing.JPanel pnlMedicamento;
     private javax.swing.JPanel pnlPrevisualizacionProducto;
     private javax.swing.JPanel pnlSucursal;
     private javax.swing.JPanel pnlTitulo;
+    private javax.swing.JTable tblHistoricoProductos;
     private javax.swing.JTable tblProductos;
     private javax.swing.JTextField txtNombreProducto;
     // End of variables declaration//GEN-END:variables
